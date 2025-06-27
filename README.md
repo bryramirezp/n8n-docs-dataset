@@ -1,60 +1,85 @@
 # n8n AI Knowledge Base
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/tu-usuario/n8n-ai-knowledge-base)
-![Repo size](https://img.shields.io/github/repo-size/tu-usuario/n8n-ai-knowledge-base)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/your-username/n8n-ai-knowledge-base/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/your-username/n8n-ai-knowledge-base)](https://github.com/your-username/n8n-ai-knowledge-base/commits/main)
+[![GitHub repo size](https://img.shields.io/github/repo-size/your-username/n8n-ai-knowledge-base)](https://github.com/your-username/n8n-ai-knowledge-base)
+
+**Note:** Remember to replace `your-username` in the badges above with your actual GitHub username.
 
 ---
 
 An open-source project that provides a high-quality, structured JSONL dataset of the entire n8n documentation, ready to be used as a knowledge base for AI applications and RAG (Retrieval-Augmented Generation) systems. This repository includes the Python script used to generate and maintain the dataset, designed to transform technical markdown into a clean, machine-readable format.
 
-## The Problem
+## Key Features: Why This Project Matters
 
-The official n8n documentation is comprehensive but exists as a large collection of interconnected web pages. This format is ideal for human reading but presents a significant challenge for AI systems. Feeding documentation to an LLM requires a consolidated, clean, and structured format to avoid errors and get precise, factual responses. As seen in the n8n community, many users are looking for an easy way to use the documentation to power their AI-driven workflow builders.
+The official n8n documentation is excellent for humans but challenging for AI. This project bridges that gap.
 
-## The Solution
+* **🧠 Structured & Intelligent:** Instead of a wall of text, this dataset breaks down the documentation into atomic, structured JSON objects. Each object contains not just text, but also metadata, keywords, and extracted entities like code blocks and parameters.
+* **🤖 Machine-Readable & Optimized for AI:** The JSONL format is ideal for feeding into LLMs, reducing the risk of hallucinations and enabling more accurate, fact-based responses from your AI assistant.
+* **📚 Comprehensive & Consolidated:** Provides a single, unified source file (`n8n_docs_combined.md`) from the many scattered documentation pages, solving a key problem for the community.
+* **🔧 Maintainable & Reproducible:** The included Python script (`generate_dataset.py`) is not a one-off tool. It's a resilient, reusable asset that allows anyone to regenerate this dataset from the latest n8n documentation, ensuring your knowledge base never becomes stale.
 
-This project solves that problem by providing two key assets:
+## Getting Started: Choose Your Path
 
-1.  **A Pre-processed, Structured Dataset (`n8n_qa_dataset.jsonl`):** A ready-to-use JSONL file containing the entire n8n documentation converted into a list of structured objects. Each object contains not just a question and answer, but also metadata, keywords, and structured data like code blocks and parameters.
+### Path 1: The AI Builder (Quick Start)
 
-2.  **A Robust Generation Script (`generar_dataset.py`):** The Python script used to create the dataset. It's designed to be resilient, with error handling and partial-save features, allowing advanced users to regenerate the dataset from updated documentation in the future.
-
-## Getting Started
-
-You can use this project in two primary ways, depending on your needs.
-
-### Use Case 1: I just want the data for my AI Assistant
-
-This is the fastest way to get started. You don't need to run any code.
+**Goal:** You want to build an AI assistant *now* and don't need to run any code.
 
 1.  **Download the Dataset:** Go to the root of this repository and download the `n8n_qa_dataset.jsonl` file.
-2.  **Upload to your AI Platform:** Upload this file to the "Knowledge" or "Documents" section of your AI tool (e.g., OpenAI's Custom GPTs, a custom RAG pipeline using LangChain, etc.).
-3.  **Use a Strong System Prompt:** When configuring your AI assistant, use precise instructions to ensure it relies on the provided knowledge.
+2.  **Upload to your AI Platform:** Upload this file directly to the "Knowledge" or "Documents" section of your AI tool (e.g., OpenAI's Custom GPTs, a custom RAG pipeline using LangChain, etc.).
+3.  **Use a Strong System Prompt:** To ensure your assistant relies on this high-quality data, configure it with precise instructions.
 
-    **Example System Prompt for a Custom GPT:**
+    > **Example System Prompt for a Custom GPT:**
+    >
     > Your role is 'n8n Expert Technical Assistant'. Your only source of truth is the knowledge provided in the uploaded files. When a user asks a question about n8n, you must search your knowledge base for the most relevant structured record. Your answer should be based exclusively on the `concise_answer` and `structured_data` from that record. If the information is not in the knowledge base, you must respond exactly with: "I could not find a precise answer to that question in my knowledge base." You are forbidden from using your general pre-trained knowledge about n8n.
 
-### Use Case 2: I want to run or modify the generation script
+### Path 2: The Developer (Full Replication)
 
-This is for advanced users who want to regenerate the dataset from a different source document or with modified parameters.
+**Goal:** You want to create a fresh dataset from scratch using the most current version of the n8n docs.
 
-1.  **Clone the repository:**
+#### Stage A: Create the Source Document
+
+First, you need to clone the official n8n documentation repository and consolidate all markdown files.
+
+1.  **Clone the official n8n-docs repository:**
     ```bash
-    git clone [https://github.com/tu-usuario/n8n-ai-knowledge-base.git](https://github.com/tu-usuario/n8n-ai-knowledge-base.git)
+    git clone [https://github.com/n8n-io/n8n-docs.git](https://github.com/n8n-io/n8n-docs.git)
+    ```
+
+2.  **Consolidate the Markdown Files:** Navigate into the `n8n-docs/docs` directory. From there, run the appropriate command for your operating system.
+
+    * **On macOS or Linux:**
+        ```bash
+        cd n8n-docs/docs
+        find . -name "*.md" -print0 | xargs -0 cat > ../../n8n_docs_combined.md
+        ```
+        This command will create `n8n_docs_combined.md` in your project's root folder (`n8n-ai-knowledge-base`).
+
+    * **On Windows (using PowerShell):**
+        ```powershell
+        cd n8n-docs\docs
+        $outputFile = "..\..\n8n_docs_combined.md"
+        # Ensure the output file is empty before starting
+        Clear-Content -Path $outputFile -ErrorAction SilentlyContinue
+        Get-ChildItem -Recurse -Filter "*.md" | ForEach-Object { Get-Content $_.FullName | Add-Content -Path $outputFile }
+        ```
+        This will also create the consolidated file in your project's root directory.
+
+#### Stage B: Run the Generation Script
+
+Now that you have the source file, you can run the Python script.
+
+1.  **Clone this repository:**
+    ```bash
+    git clone [https://github.com/your-username/n8n-ai-knowledge-base.git](https://github.com/your-username/n8n-ai-knowledge-base.git)
     cd n8n-ai-knowledge-base
     ```
 
 2.  **Set up the environment:**
     ```bash
-    # Create a virtual environment
     python -m venv venv
-
-    # Activate it (Windows)
-    .\venv\Scripts\Activate.ps1
-    
-    # Activate it (macOS/Linux)
-    source venv/bin/activate
+    # On Windows: .\venv\Scripts\Activate.ps1
+    # On macOS/Linux: source venv/bin/activate
     ```
 
 3.  **Install dependencies:**
@@ -63,16 +88,21 @@ This is for advanced users who want to regenerate the dataset from a different s
     ```
 
 4.  **Configure your API Key:**
-    * Create a file named `.env` in the root of the project.
+    * Create a file named `.env` in the project root.
     * Add your OpenAI API key to it: `OPENAI_API_KEY="sk-..."`
 
-5.  **Provide the Source Document:**
-    * Place your consolidated markdown file named `n8n_docs_combined.md` in the root of the project.
+5.  **Run the script:**
 
-6.  **Run the script:**
+    > **Cost & Model Considerations:**
+    >
+    > Be aware that running this script incurs costs through the OpenAI API. In a test run processing the full documentation (`~3.8MB` of text), the total cost was **approximately $2.00 USD** using the default `gpt-4o` model.
+    >
+    > This is an estimate. Your actual cost will vary based on the documentation's exact size and current OpenAI API pricing. For a significantly more cost-effective option, you can edit `generate_dataset.py` and change the `MODEL_LLM` variable to `"gpt-4o-mini"`. This model is much cheaper but may have a slightly higher rate of formatting errors.
+
     ```bash
-    python generar_dataset.py
+    python generate_dataset.py
     ```
+    The script will find `n8n_docs_combined.md`, process it, and generate your new `n8n_qa_dataset.jsonl`.
 
 ## Dataset Structure
 
