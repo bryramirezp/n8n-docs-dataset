@@ -51,9 +51,23 @@ This path is for users who want to build an AI assistant *now* and don't need to
 
 ## 🛠️ Advanced Usage: Generate the Dataset from Scratch
 
-This path is for developers who want to create a fresh dataset from the most current n8n documentation. This process is divided into two main stages.
+This path is for developers who want to create a fresh dataset from the most current n8n documentation. This process ensures you are working with the latest possible information.
 
-### Stage 1: Consolidate the Official n8n Documentation
+### Prerequisites
+
+Before you begin, ensure you have the following installed. You can check by opening a terminal (or PowerShell on Windows) and running these commands:
+
+* **Python (3.8 or higher):**
+    ```bash
+    python --version
+    ```
+* **PIP (Python's package manager):**
+    ```bash
+    pip --version
+    ```
+* **A Code Editor:** **Visual Studio Code is highly recommended**. It has an excellent integrated terminal (you can open it with `Ctrl+` \` or `View > Terminal`), which makes running all the commands in one place simple and efficient.
+
+### Step 1: Consolidate the Official n8n Documentation
 
 First, you need a local copy of the official n8n documentation, which you will then combine into a single source file.
 
@@ -68,7 +82,7 @@ First, you need a local copy of the official n8n documentation, which you will t
     ```
 
 3.  **Consolidate all Markdown files into one:**
-    From inside the `n8n-docs/docs` directory, run the command appropriate for your operating system. This command will find every `.md` file and combine its content into a single file named `n8n_docs_combined.md` located two levels up (in the same directory as the `n8n-docs` folder).
+    From inside the `n8n-docs/docs` directory, run the command for your operating system. This will create a single file named `n8n_docs_combined.md` in the parent directory of your `n8n-docs` folder.
 
     * **On macOS or Linux:**
         ```bash
@@ -82,25 +96,32 @@ First, you need a local copy of the official n8n documentation, which you will t
         Get-ChildItem -Recurse -Filter "*.md" | ForEach-Object { Get-Content $_.FullName | Add-Content -Path $outputFile }
         ```
     
-    After this step, you can navigate back to your original project directory.
+4.  **Return to your starting directory:**
     ```bash
     cd ../../ 
     ```
 
-### Stage 2: Run the Dataset Generation Script
+### Step 2: Set Up the Generation Project
 
-Now that you have the source file, you can use the Python script from *this* repository to generate the structured dataset.
+Now you will set up this repository to process the file you just created.
 
-1.  **Clone this repository (if you haven't already):**
+1.  **Clone this repository:**
     ```bash
     git clone https://github.com/bryramirezp/n8n-docs-dataset.git
-    cd n8n-docs-dataset
     ```
 
-2.  **Move the source file into this project:**
-    Move the `n8n_docs_combined.md` file you created in Stage 1 into the `n8n-docs-dataset` project folder.
+2.  **Enter the project directory and move the source file:**
+    ```bash
+    # Move into the project folder
+    cd n8n-docs-dataset
 
-3.  **Set up a Python virtual environment:**
+    # Move the consolidated doc file into this folder
+    # Use 'move' on Windows CMD or 'mv' on PowerShell/macOS/Linux
+    mv ../n8n_docs_combined.md .
+    ```
+
+3.  **Create and activate a virtual environment:**
+    A virtual environment is crucial for keeping project dependencies isolated.
     ```bash
     # Create the virtual environment
     python -m venv venv
@@ -108,30 +129,57 @@ Now that you have the source file, you can use the Python script from *this* rep
     # Activate it
     # On Windows (PowerShell):
     .\venv\Scripts\Activate.ps1
+    # If you get an execution policy error, run the following command and then try activating again:
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+    
     # On macOS/Linux:
     source venv/bin/activate
     ```
+    You'll know it's active when you see `(venv)` at the beginning of your terminal prompt.
 
 4.  **Install dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
 
-5.  **Configure your API Key:**
-    * Create a file named `.env` in the project root.
-    * Add your OpenAI API key to it like this:
+5.  **Configure your OpenAI API Key:**
+    You need to create a `.env` file to securely store your OpenAI API key. The file must be saved with **UTF-8** encoding.
+
+    **Method 1: Manual Creation**
+    * In your code editor (like VS Code), create a new file named `.env` in the project root.
+    * Add the following line, replacing `sk-...` with your actual secret key:
         ```
         OPENAI_API_KEY="sk-..."
         ```
+    * Ensure you save the file with UTF-8 encoding. In VS Code, you can check and change the encoding in the bottom-right status bar.
 
-6.  **Run the script:**
-    > **Cost & Model Notice:**
-    > Running this script incurs costs via the OpenAI API. A full run with the `gpt-4o` model on a ~3.8MB source file cost approximately **$2.00 USD**. This is an estimate. For a cheaper, faster option, you can edit `generate_dataset.py` and change the `LLM_MODEL` variable to `"gpt-4o-mini"`.
+    **Method 2: Quick Command**
+    You can create the file with the correct content and encoding in one step. **Remember to replace `sk-...` with your actual key inside the quotes.**
 
+    * **On Linux, macOS, or Git Bash (Windows):**
+        ```bash
+        echo 'OPENAI_API_KEY="sk-..."' > .env
+        ```
+    * **On Windows PowerShell (Recommended):**
+        ```powershell
+        'OPENAI_API_KEY="sk-..."' | Out-File -FilePath .env -Encoding utf8
+        ```
+
+### Step 3: Run the Script and Generate the Dataset
+
+With everything in place, you are ready to generate the dataset.
+
+1.  **Execute the script:**
+    In your terminal (with the `venv` still active), run the following command:
     ```bash
     python generate_dataset.py
     ```
-    Once the script finishes, you will find the `n8n_qa_dataset.jsonl` file in your project directory, ready to be used.
+
+2.  **Monitor the progress:**
+    The script will print status updates to the terminal, showing you that it's loading the file, splitting it into chunks, and processing each chunk with the LLM. This is the longest part of the process and can take several minutes.
+
+3.  **Verify the output:**
+    Once the script shows the "Process finished!" message, a new file named `n8n_qa_dataset.jsonl` will appear in your project folder. You can open it to inspect the structured Q&A pairs. This file is your final, ready-to-use dataset.
 
 ## Dataset Schema
 
