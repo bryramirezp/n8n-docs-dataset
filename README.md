@@ -59,7 +59,7 @@ First, you need a local copy of the official n8n documentation, which you will t
 
 1.  **Clone the official `n8n-docs` repository:**
     ```bash
-    git clone [https://github.com/n8n-io/n8n-docs.git](https://github.com/n8n-io/n8n-docs.git)
+    git clone https://github.com/n8n-io/n8n-docs.git
     ```
 
 2.  **Navigate into the `docs` directory:**
@@ -93,7 +93,7 @@ Now that you have the source file, you can use the Python script from *this* rep
 
 1.  **Clone this repository (if you haven't already):**
     ```bash
-    git clone [https://github.com/bryramirezp/n8n-docs-dataset.git](https://github.com/bryramirezp/n8n-docs-dataset.git)
+    git clone https://github.com/bryramirezp/n8n-docs-dataset.git
     cd n8n-docs-dataset
     ```
 
