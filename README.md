@@ -45,7 +45,7 @@ This path is for users who want to build an AI assistant *now* and don't need to
 
     > **Example System Prompt:**
     >
-    > You are an 'n8n Expert Technical Assistant'. Your only source of truth is the knowledge provided in the uploaded files. Your answers must be based exclusively on the `concise_answer` and `structured_data` from the records you find. If the information is not in your knowledge base, you must state: "I could not find a precise answer to that question in my knowledge base." You are forbidden from using your general pre-trained knowledge about n8n.
+    > You are an 'n8n Expert Technical Assistant'. Your only source of truth is the knowledge provided in the uploaded files. Your answers must be based exclusively on the `concise_answer` and `structured_data` from the records you find. If you cannot find the information in your knowledge base, you must state: "I could not find a precise answer to that question in my knowledge base." You are forbidden from using your general pre-trained knowledge about n8n.
 
 ---
 
@@ -65,7 +65,7 @@ Before you begin, ensure you have the following installed. You can check by open
     ```bash
     pip --version
     ```
-* **A Code Editor:** **Visual Studio Code is highly recommended**. It has an excellent integrated terminal (you can open it with `Ctrl+` \` or `View > Terminal`), which makes running all the commands in one place simple and efficient.
+* **A Code Editor:** **Visual Studio Code is highly recommended**. It has an excellent integrated terminal (you can open it with `Ctrl+` \` or `View > Terminal`), and it allows you to easily control file encoding, which is critical for this project.
 
 ### Step 1: Consolidate the Official n8n Documentation
 
@@ -82,20 +82,17 @@ First, you need a local copy of the official n8n documentation, which you will t
     ```
 
 3.  **Consolidate all Markdown files into one:**
-    From inside the `n8n-docs/docs` directory, run the command for your operating system. This will create a single file named `n8n_docs_combined.md` in the parent directory of your `n8n-docs` folder.
-
+    From inside the `n8n-docs/docs` directory, run the command for your operating system.
     * **On macOS or Linux:**
         ```bash
         find . -name "*.md" -print0 | xargs -0 cat > ../../n8n_docs_combined.md
         ```
-
     * **On Windows (using PowerShell):**
         ```powershell
         $outputFile = "..\..\n8n_docs_combined.md"
         if (Test-Path $outputFile) { Clear-Content -Path $outputFile }
         Get-ChildItem -Recurse -Filter "*.md" | ForEach-Object { Get-Content $_.FullName | Add-Content -Path $outputFile }
         ```
-    
 4.  **Return to your starting directory:**
     ```bash
     cd ../../ 
@@ -105,23 +102,14 @@ First, you need a local copy of the official n8n documentation, which you will t
 
 Now you will set up this repository to process the file you just created.
 
-1.  **Clone this repository:**
+1.  **Clone this repository, enter the directory, and move the source file:**
     ```bash
     git clone https://github.com/bryramirezp/n8n-docs-dataset.git
-    ```
-
-2.  **Enter the project directory and move the source file:**
-    ```bash
-    # Move into the project folder
     cd n8n-docs-dataset
-
-    # Move the consolidated doc file into this folder
-    # Use 'move' on Windows CMD or 'mv' on PowerShell/macOS/Linux
     mv ../n8n_docs_combined.md .
     ```
 
-3.  **Create and activate a virtual environment:**
-    A virtual environment is crucial for keeping project dependencies isolated.
+2.  **Create and activate a virtual environment:**
     ```bash
     # Create the virtual environment
     python -m venv venv
@@ -130,40 +118,36 @@ Now you will set up this repository to process the file you just created.
     # On Windows (PowerShell):
     .\venv\Scripts\Activate.ps1
     # If you get an execution policy error, run the following command and then try activating again:
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+    # Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
     
     # On macOS/Linux:
     source venv/bin/activate
     ```
-    You'll know it's active when you see `(venv)` at the beginning of your terminal prompt.
 
-4.  **Install dependencies:**
+3.  **Install dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
 
-5.  **Configure your OpenAI API Key:**
-    You need to create a `.env` file to securely store your OpenAI API key. The file must be saved with **UTF-8** encoding.
+4.  **Configure your OpenAI API Key:**
+    Creating the `.env` file correctly is critical. It **must** be saved with **UTF-8** encoding. The most reliable way to do this is by creating the file manually in a code editor like VS Code.
 
-    **Method 1: Manual Creation**
-    * In your code editor (like VS Code), create a new file named `.env` in the project root.
-    * Add the following line, replacing `sk-...` with your actual secret key:
+    1.  **Create the file:** In your code editor, create a new file in the project root. Name it exactly `.env`.
+    2.  **Add your key:** Paste the following line into the file, replacing `sk-...` with your actual key.
         ```
         OPENAI_API_KEY="sk-..."
         ```
-    * Ensure you save the file with UTF-8 encoding. In VS Code, you can check and change the encoding in the bottom-right status bar.
+    3.  **Save the file**, ensuring the encoding is `UTF-8`.
 
-    **Method 2: Quick Command**
-    You can create the file with the correct content and encoding in one step. **Remember to replace `sk-...` with your actual key inside the quotes.**
-
-    * **On Linux, macOS, or Git Bash (Windows):**
-        ```bash
-        echo 'OPENAI_API_KEY="sk-..."' > .env
-        ```
-    * **On Windows PowerShell (Recommended):**
-        ```powershell
-        'OPENAI_API_KEY="sk-..."' | Out-File -FilePath .env -Encoding utf8
-        ```
+    > #### Troubleshooting Encoding Errors
+    > If you run the script and get a `UnicodeDecodeError`, it means the `.env` file was saved with the wrong encoding (like `UTF-8 with BOM`). Here is the foolproof way to fix it in VS Code:
+    >
+    > 1.  Open the `.env` file in Visual Studio Code.
+    > 2.  In the status bar at the bottom-right, click where it says `UTF-8 with BOM` or any other encoding.
+    > 3.  A menu will open at the top. Select **"Save with Encoding"**.
+    > 4.  From the list that appears, choose **"UTF-8"**.
+    >
+    > Done! This will save the file in the correct format, and your Python script will now run without problems.
 
 ### Step 3: Run the Script and Generate the Dataset
 
@@ -176,10 +160,10 @@ With everything in place, you are ready to generate the dataset.
     ```
 
 2.  **Monitor the progress:**
-    The script will print status updates to the terminal, showing you that it's loading the file, splitting it into chunks, and processing each chunk with the LLM. This is the longest part of the process and can take several minutes.
+    The script will print status updates to the terminal as it loads the file, splits it into chunks, and processes each chunk. This is the longest part of the process and can take several minutes.
 
 3.  **Verify the output:**
-    Once the script shows the "Process finished!" message, a new file named `n8n_qa_dataset.jsonl` will appear in your project folder. You can open it to inspect the structured Q&A pairs. This file is your final, ready-to-use dataset.
+    Once the script shows the "Process finished!" message, a new file named `n8n_qa_dataset.jsonl` will appear in your project folder. This file is your final, ready-to-use dataset.
 
 ## Dataset Schema
 
