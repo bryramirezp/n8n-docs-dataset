@@ -8,17 +8,17 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
-# --- CONFIGURACIÓN Y CONSTANTES ---
+# --- CONFIGURATION AND CONSTANTS ---
 load_dotenv()
-ARCHIVO_ENTRADA = "n8n_docs_combined.md"
-ARCHIVO_SALIDA_FINAL = "n8n_qa_dataset.jsonl"
-ARCHIVO_SALIDA_PARCIAL = "n8n_qa_dataset_partial.jsonl"
-MODELO_LLM = "gpt-4o"
-TEMPERATURA = 0.0
+INPUT_FILE = "n8n_docs_combined.md"
+FINAL_OUTPUT_FILE = "n8n_qa_dataset.jsonl"
+PARTIAL_OUTPUT_FILE = "n8n_qa_dataset_partial.jsonl"
+LLM_MODEL = "gpt-4o"
+TEMPERATURE = 0.0
 CHUNK_SIZE = 4000
 CHUNK_OVERLAP = 200
 
-# --- PLANTILLA DE PROMPT (VALIDADA) ---
+# --- VALIDATED PROMPT TEMPLATE ---
 PROMPT_TEMPLATE = """
 Act as an expert data engineer specializing in creating high-quality datasets to feed RAG (Retrieval-Augmented Generation) systems. Your mission is to process snippets of n8n's technical documentation and transform them into structured, self-contained JSON objects.
 
@@ -49,8 +49,8 @@ CRITICAL RULES:
 
 def clean_llm_response(response_content):
     """
-    Limpia la respuesta del LLM, eliminando los bloques de código Markdown
-    y cualquier texto antes o después del JSON principal.
+    Cleans the LLM's response by removing Markdown code blocks
+    and any surrounding text before or after the main JSON content.
     """
     match = re.search(r'```(json)?\s*([\s\S]*?)\s*```', response_content, re.DOTALL)
     if match:
@@ -58,59 +58,59 @@ def clean_llm_response(response_content):
     return response_content.strip()
 
 def pre_run_checks():
-    """Verifica todas las pre-condiciones antes de gastar dinero en la API."""
-    print("--- Realizando verificaciones pre-ejecución ---")
+    """Verifies all preconditions before spending money on the API."""
+    print("--- Performing pre-run checks ---")
     if not os.getenv("OPENAI_API_KEY"):
-        print("Error Crítico: La variable de entorno OPENAI_API_KEY no está configurada.")
+        print("Critical Error: OPENAI_API_KEY environment variable is not set.")
         return False
-    print("OK: Clave de API de OpenAI encontrada.")
-    if not os.path.exists(ARCHIVO_ENTRADA):
-        print(f"Error Crítico: El archivo de entrada '{ARCHIVO_ENTRADA}' no se encontró.")
+    print("OK: OpenAI API Key found.")
+    if not os.path.exists(INPUT_FILE):
+        print(f"Critical Error: Input file '{INPUT_FILE}' not found.")
         return False
-    print(f"OK: Archivo de entrada '{ARCHIVO_ENTRADA}' encontrado.")
-    if os.path.getsize(ARCHIVO_ENTRADA) == 0:
-        print(f"Error Crítico: El archivo de entrada '{ARCHIVO_ENTRADA}' está vacío.")
+    print(f"OK: Input file '{INPUT_FILE}' found.")
+    if os.path.getsize(INPUT_FILE) == 0:
+        print(f"Critical Error: Input file '{INPUT_FILE}' is empty.")
         return False
-    print(f"OK: Archivo de entrada no está vacío (Tamaño: {os.path.getsize(ARCHIVO_ENTRADA)} bytes).")
-    print("--- Todas las verificaciones pasaron. Iniciando proceso. ---\n")
+    print(f"OK: Input file is not empty (Size: {os.path.getsize(INPUT_FILE)} bytes).")
+    print("--- All checks passed. Starting process. ---\n")
     return True
 
 def main():
-    """Función principal que orquesta todo el proceso de generación."""
+    """Main function that orchestrates the entire generation process."""
     if not pre_run_checks():
         return
 
-    print("Paso 1: Cargando y dividiendo el documento...")
-    loader = UnstructuredMarkdownLoader(ARCHIVO_ENTRADA)
+    print("Step 1: Loading and splitting the document...")
+    loader = UnstructuredMarkdownLoader(INPUT_FILE)
     docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     chunks = text_splitter.split_documents(docs)
-    print(f"Documento dividido en {len(chunks)} fragmentos.")
+    print(f"Document split into {len(chunks)} chunks.")
 
-    llm = ChatOpenAI(model=MODELO_LLM, temperature=TEMPERATURA)
+    llm = ChatOpenAI(model=LLM_MODEL, temperature=TEMPERATURE)
     prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     chain = prompt | llm
     
     processed_indices = set()
-    if os.path.exists(ARCHIVO_SALIDA_PARCIAL):
-        print(f"\nSe encontró un archivo de progreso anterior '{ARCHIVO_SALIDA_PARCIAL}'. Cargando resultados...")
-        with open(ARCHIVO_SALIDA_PARCIAL, 'r', encoding='utf-8') as f:
+    if os.path.exists(PARTIAL_OUTPUT_FILE):
+        print(f"\nFound previous progress file '{PARTIAL_OUTPUT_FILE}'. Loading results...")
+        with open(PARTIAL_OUTPUT_FILE, 'r', encoding='utf-8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
                     processed_indices.add(data['chunk_index'])
                 except (json.JSONDecodeError, KeyError):
-                    print(f"Advertencia: Se encontró una línea malformada en el archivo parcial y se omitirá.")
-        print(f"Se reanudará el proceso, omitiendo {len(processed_indices)} fragmentos ya procesados.")
+                    print(f"Warning: Malformed line found in partial file, skipping.")
+        print(f"Resuming process, skipping {len(processed_indices)} already processed chunks.")
 
-    print(f"\nPaso 2: Procesando fragmentos con {MODELO_LLM}...")
+    print(f"\nStep 2: Processing chunks with {LLM_MODEL}...")
     try:
         for i, chunk in enumerate(chunks):
             if i in processed_indices:
                 continue
 
             try:
-                print(f"Procesando fragmento {i + 1}/{len(chunks)}...")
+                print(f"Processing chunk {i + 1}/{len(chunks)}...")
                 response = chain.invoke({"context": chunk.page_content})
                 cleaned_content = clean_llm_response(response.content)
                 generated_json = json.loads(cleaned_content)
@@ -118,47 +118,46 @@ def main():
                 if isinstance(generated_json, list):
                     validated_items = [item for item in generated_json if 'user_question' in item and 'concise_answer' in item]
                     if validated_items:
-                        with open(ARCHIVO_SALIDA_PARCIAL, "a", encoding="utf-8") as f:
+                        with open(PARTIAL_OUTPUT_FILE, "a", encoding="utf-8") as f:
                             for item in validated_items:
                                 record = {'chunk_index': i, 'content': item}
                                 f.write(json.dumps(record, ensure_ascii=False) + "\n")
-                        print(f" -> Éxito. Se guardaron {len(validated_items)} nuevos registros.")
+                        print(f" -> Success. Saved {len(validated_items)} new records.")
                     else:
-                        print(f" -> Advertencia: La lista generada no contenía objetos válidos.")
+                        print(f" -> Warning: The generated list did not contain valid objects.")
                 else:
-                    print(f" -> Advertencia: El resultado no era una lista. Se omite.")
+                    print(f" -> Warning: The result was not a list. Skipping.")
 
             except json.JSONDecodeError:
-                print(f" -> Error de Decodificación después de la limpieza. El LLM devolvió un formato inválido. Se omite el fragmento.")
+                print(f" -> Decoding Error after cleaning. LLM returned invalid format. Skipping chunk.")
             except Exception as e:
-                print(f" -> Error Inesperado: {e}. Se omite el fragmento.")
+                print(f" -> Unexpected Error: {e}. Skipping chunk.")
     
     finally:
-        print("\nProcesamiento completado o interrumpido.")
-        # La copia final solo ocurre si el bucle termina sin interrupción manual (Ctrl+C)
+        print("\nProcessing finished or interrupted.")
         if 'i' in locals() and i == len(chunks) - 1:
-            print("Proceso completado. Consolidando el archivo final...")
+            print("Process completed. Consolidating the final file...")
             final_data = []
-            if os.path.exists(ARCHIVO_SALIDA_PARCIAL):
-                with open(ARCHIVO_SALIDA_PARCIAL, 'r', encoding='utf-8') as f:
+            if os.path.exists(PARTIAL_OUTPUT_FILE):
+                with open(PARTIAL_OUTPUT_FILE, 'r', encoding='utf-8') as f:
                     for line in f:
                         try:
                             final_data.append(json.loads(line)['content'])
                         except (json.JSONDecodeError, KeyError):
                             continue
             
-            with open(ARCHIVO_SALIDA_FINAL, "w", encoding="utf-8") as f:
+            with open(FINAL_OUTPUT_FILE, "w", encoding="utf-8") as f:
                 for item in final_data:
                     f.write(json.dumps(item, ensure_ascii=False) + "\n")
 
-            os.remove(ARCHIVO_SALIDA_PARCIAL)
-            print(f"\n¡Proceso finalizado! Se generó el archivo final '{ARCHIVO_SALIDA_FINAL}' con {len(final_data)} registros.")
+            os.remove(PARTIAL_OUTPUT_FILE)
+            print(f"\nProcess finished! Final file '{FINAL_OUTPUT_FILE}' was generated with {len(final_data)} records.")
         else:
-             total_registros = 0
-             if os.path.exists(ARCHIVO_SALIDA_PARCIAL):
-                with open(ARCHIVO_SALIDA_PARCIAL, 'r', encoding='utf-8') as f:
-                    total_registros = sum(1 for line in f)
-             print(f"El proceso se interrumpió. El progreso ({total_registros} registros) está guardado en '{ARCHIVO_SALIDA_PARCIAL}'.")
+             total_records = 0
+             if os.path.exists(PARTIAL_OUTPUT_FILE):
+                with open(PARTIAL_OUTPUT_FILE, 'r', encoding='utf-8') as f:
+                    total_records = sum(1 for line in f)
+             print(f"Process was interrupted. Current progress ({total_records} records) is saved in '{PARTIAL_OUTPUT_FILE}'.")
 
 
 if __name__ == "__main__":
