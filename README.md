@@ -1,8 +1,8 @@
 # n8n AI Knowledge Base
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/your-username/n8n-ai-knowledge-base/blob/main/LICENSE)
-[![GitHub last commit](https://img.shields.io/github/last-commit/your-username/n8n-ai-knowledge-base)](https://github.com/your-username/n8n-ai-knowledge-base/commits/main)
-[![GitHub repo size](https://img.shields.io/github/repo-size/your-username/n8n-ai-knowledge-base)](https://github.com/your-username/n8n-ai-knowledge-base)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/your-username/n8n-docs-dataset/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/your-username/n8n-docs-dataset)](https://github.com/your-username/n8n-docs-dataset/commits/main)
+[![GitHub repo size](https://img.shields.io/github/repo-size/your-username/n8n-docs-dataset)](https://github.com/your-username/n8n-docs-dataset)
 
 **Note:** Remember to replace `your-username` in the badges above with your actual GitHub username.
 
