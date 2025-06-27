@@ -4,9 +4,18 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/bryramirezp/n8n-docs-dataset)](https://github.com/bryramirezp/n8n-docs-dataset/commits/main)
 [![GitHub repo size](https://img.shields.io/github/repo-size/bryramirezp/n8n-docs-dataset)](https://github.com/bryramirezp/n8n-docs-dataset)
 
-A high-quality, structured JSONL dataset of the n8n documentation, optimized for AI applications and RAG (Retrieval-Augmented Generation) systems.
+---
 
-This repository provides both the pre-processed dataset and the Python script used to generate it, allowing for immediate use and future maintenance.
+This project provides the key to building your own expert AI partner for n8n workflow creation. It contains a high-quality, structured dataset of the entire n8n documentation, ready to be used as the core knowledge for powerful Custom GPTs, Gems, or other AI assistants.
+
+You get the pre-processed, valuable dataset for immediate use, and this repository also explains how to regenerate this knowledge base yourself, ensuring your AI partner always has the most up-to-date information from the official docs.
+
+## Key Features: Why This Project Matters
+
+* **🧠 Structured & Intelligent:** Instead of a wall of text, this dataset breaks down the documentation into atomic, structured JSON objects. Each object contains not just text, but also metadata, keywords, and extracted entities like code blocks and parameters.
+* **🤖 Machine-Readable & Optimized for AI:** The JSONL format is ideal for feeding into LLMs, reducing the risk of hallucinations and enabling more accurate, fact-based responses from your AI assistant.
+* **📚 Comprehensive & Consolidated:** Provides a single, unified source file from the many scattered documentation pages, solving a key problem for the community.
+* **🔧 Maintainable & Reproducible:** The included Python script (`generate_dataset.py`) is not a one-off tool. It's a resilient, reusable asset that allows anyone to regenerate this dataset from the latest n8n documentation, ensuring your knowledge base never becomes stale.
 
 ## Project Status
 
@@ -15,14 +24,13 @@ This repository provides both the pre-processed dataset and the Python script us
 | **Total Records** | 716 |
 | **Source Docs Date** | `2025-06-08` |
 | **Source File Size** | `3.77 MB` |
-| **Repository Size** | `26.1 MB` |
 | **Default LLM** | `gpt-4o` |
 
 ---
 
 ## Quick Start: Using the Dataset
 
-This path is for users who want to use the dataset immediately without running any code.
+This path is for users who want to build an AI assistant *now* and don't need to run any code.
 
 1.  **Download the Dataset:** From the root of this repository, download the `n8n_qa_dataset.jsonl` file.
 2.  **Upload to your AI Platform:** Upload this file directly to the "Knowledge" section of your chosen AI tool (e.g., [OpenAI's Custom GPTs](https://chat.openai.com/gpts/editor), a custom RAG pipeline, etc.).
