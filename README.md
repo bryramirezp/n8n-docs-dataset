@@ -17,14 +17,16 @@ You get the pre-processed, valuable dataset for immediate use, and this reposito
 * **📚 Comprehensive & Consolidated:** Provides a single, unified source file from the many scattered documentation pages, solving a key problem for the community.
 * **🔧 Maintainable & Reproducible:** The included Python script (`generate_dataset.py`) is not a one-off tool. It's a resilient, reusable asset that allows anyone to regenerate this dataset from the latest n8n documentation, ensuring your knowledge base never becomes stale.
 
-## Project Status
+## Dataset At a Glance (Project Status)
 
-| Metric | Value |
-| :--- | :--- |
-| **Total Records** | 716 |
-| **Source Docs Date** | `2025-06-08` |
-| **Source File Size** | `3.77 MB` |
-| **Default LLM** | `gpt-4o` |
+This section provides transparency on the scale and freshness of the provided dataset.
+
+| Metric | Value | Purpose |
+| :--- | :--- | :--- |
+| **Total Records** | `716` | Indicates the total number of structured Q&A pairs in the dataset. |
+| **Source Docs Date** | `2025-06-08` | Shows the "freshness" of the data, based on the source files. |
+| **Source File Size**| `3.77 MB` | The size of the raw, consolidated `n8n_docs_combined.md` file. |
+| **Default LLM Used**| `gpt-4o` | The model used for generation, implying high-quality extraction. |
 
 ---
 
@@ -52,7 +54,7 @@ First, you need to clone the official n8n documentation repository and consolida
 
 1.  **Clone the official `n8n-docs` repository:**
     ```bash
-    git clone [https://github.com/n8n-io/n8n-docs.git](https://github.com/n8n-io/n8n-docs.git)
+    git clone https://github.com/n8n-io/n8n-docs.git
     ```
 
 2.  **Consolidate the Markdown Files:** Navigate into the `n8n-docs/docs` directory. From there, run the appropriate command for your operating system.
